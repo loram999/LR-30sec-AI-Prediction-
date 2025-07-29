@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LorAm 30sec AI - Enhanced Cyberpunk</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --main-bg: #0e0e14;
+    --glass-bg: rgba(255, 255, 255, 0.06);
+    --glow-blue: #05d9e8;
+    --glow-pink: #ff2a6d;
+    --text-color: #e0e0ff;
+    --radius: 20px;
+    --green-glow: #00ff85;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0; padding: 0;
+  }
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: linear-gradient(145deg, #0e0e14, #1e1e2a);
+    color: var(--text-color);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .page {
+    width: 100%;
+    max-width: 460px;
+    padding: 2rem 2rem 3rem;
+    border-radius: var(--radius);
+    background: var(--glass-bg);
+    box-shadow: 0 0 25px rgba(5, 217, 232, 0.2);
+    backdrop-filter: blur(16px);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+  }
+  .page.active {
+    display: flex;
+  }
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.4rem;
+    margin-bottom: 1.8rem;
+    color: var(--glow-blue);
+    text-shadow:
+      0 0 10px var(--glow-blue),
+      0 0 25px var(--glow-blue),
+      0 0 40px var(--glow-blue);
+  }
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    width: 100%;
+  }
+  .btn {
+    padding: 1.1rem;
+    width: 100%;
+    text-align: center;
+    border-radius: var(--radius);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    background: linear-gradient(90deg, var(--glow-pink), var(--glow-blue));
+    border: none;
+    cursor: pointer;
+    box-shadow:
+      0 0 12px var(--glow-pink),
+      0 0 18px var(--glow-blue);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn:hover {
+    transform: scale(1.06);
+    box-shadow:
+      0 0 25px var(--glow-pink),
+      0 0 35px var(--glow-blue);
+  }
+  /* subtle animated shine */
+  .btn::before {
+    content: "";
+    position: absolute;
+    top: 0; left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.25), transparent);
+    transform: skewX(-20deg);
+    transition: none;
+  }
+  .btn:hover::before {
+    animation: shine 1s forwards;
+  }
+  @keyframes shine {
+    0% { left: -75%; }
+    100% { left: 125%; }
+  }
+
+  .clock, .period, .timer, .result {
+    font-family: 'Orbitron', sans-serif;
+    margin: 0.8rem 0;
+    text-shadow:
+      0 0 8px var(--glow-blue),
+      0 0 15px var(--glow-blue);
+  }
+  .clock {
+    font-size: 2rem;
+  }
+  /* blinking colon for clock */
+  .clock::after {
+    content: ':';
+    animation: blinkColon 1s steps(1) infinite;
+    margin-left: -8px;
+    position: absolute;
+  }
+  @keyframes blinkColon {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0; }
+  }
+  .period {
+    font-size: 1.1rem;
+    color: var(--glow-pink);
+  }
+  .timer {
+    background: rgba(255,255,255,0.1);
+    padding: 0.7rem 1.3rem;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    border: 1.5px solid var(--glow-blue);
+    letter-spacing: 1.5px;
+  }
+  .result {
+    font-size: 2.4rem;
+    padding: 1.3rem 2.5rem;
+    margin-top: 1.4rem;
+    border-radius: 15px;
+    border: 2.5px solid var(--glow-blue);
+    user-select: none;
+  }
+  .result.big {
+    color: var(--green-glow);
+    border-color: var(--green-glow);
+    text-shadow:
+      0 0 10px var(--green-glow),
+      0 0 20px var(--green-glow);
+    animation: pulseGlow 2.2s infinite ease-in-out;
+  }
+  .result.small {
+    color: var(--glow-pink);
+    border-color: var(--glow-pink);
+    text-shadow:
+      0 0 10px var(--glow-pink),
+      0 0 20px var(--glow-pink);
+    animation: pulseGlow 2.2s infinite ease-in-out;
+  }
+  @keyframes pulseGlow {
+    0%, 100% {
+      text-shadow:
+        0 0 10px currentColor,
+        0 0 20px currentColor,
+        0 0 30px currentColor;
+      filter: brightness(1);
+    }
+    50% {
+      text-shadow:
+        0 0 20px currentColor,
+        0 0 40px currentColor,
+        0 0 60px currentColor;
+      filter: brightness(1.3);
+    }
+  }
+
+  .back-btn {
+    margin-top: 2.2rem;
+    font-size: 1rem;
+    background: none;
+    border: 1.5px solid var(--glow-pink);
+    color: var(--glow-pink);
+    padding: 0.6rem 1.3rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background-color 0.35s ease, color 0.35s ease;
+    user-select: none;
+  }
+  .back-btn:hover {
+    background: var(--glow-pink);
+    color: #fff;
+  }
+
+  /* Footer */
+  footer {
+    position: fixed;
+    bottom: 12px;
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+    font-family: 'Rajdhani', sans-serif;
+    color: var(--glow-pink);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-shadow: 0 0 8px var(--glow-pink), 0 0 20px var(--glow-pink);
+    user-select: none;
+    pointer-events: none;
+    z-index: 10;
+  }
+</style>
+</head>
+<body>
+  <!-- Home Page -->
+  <section id="home" class="page active" aria-label="Home page with links and start button">
+    <h1>LorAm 30sec AI</h1>
+    <div class="btn-group">
+      <a class="btn" href="https://t.me/bloodyhtml" target="_blank" rel="noopener noreferrer" aria-label="Telegram channel">TELEGRAM</a>
+      <a class="btn" href="http://www.cklottery.top/#/register?invitationCode=52736362592" target="_blank" rel="noopener noreferrer" aria-label="Register link">REGISTER</a>
+      <a class="btn" href="https://t.me/GodLorAm" target="_blank" rel="noopener noreferrer" aria-label="Owner Telegram">OWNER</a>
+      <button class="btn" id="ai-btn" aria-label="Start AI prediction">Start PREDICTION</button>
+    </div>
+  </section>
+
+  <!-- Prediction Page -->
+  <section id="prediction" class="page" aria-label="Prediction display">
+    <h1>Prediction</h1>
+    <div class="clock" id="clock" aria-live="polite" aria-atomic="true">--:--:--</div>
+    <div class="period" id="period">PERIOD: --</div>
+    <div class="timer" id="timer" aria-live="polite" aria-atomic="true">NEXT IN 00:30</div>
+    <div class="result" id="result">--</div>
+    <button id="back-btn" class="back-btn" aria-label="Back to home">â BACK</button>
+  </section>
+
+  <script>
+    const homePage = document.getElementById('home');
+    const predictionPage = document.getElementById('prediction');
+
+    document.getElementById('ai-btn').addEventListener('click', () => {
+      homePage.classList.remove('active');
+      predictionPage.classList.add('active');
+      if (!window.predictionStarted) {
+        initPrediction();
+        window.predictionStarted = true;
+      }
+    });
+
+    document.getElementById('back-btn').addEventListener('click', () => {
+      predictionPage.classList.remove('active');
+      homePage.classList.add('active');
+    });
+
+    function initPrediction() {
+      const patternString = "BIG SMALL BIG SMALL BIG BIG SMALL SMALL BIG BIG SMALL BIG SMALL SMALL SMALL BIG SMALL BIG BIG BIG SMALL BIG BIG SMALL BIG BIG BIG BIG SMALL BIG SMALL SMALL BIG SMALL BIG BIG SMALL BIG SMALL BIG SMALL SMALL BIG BIG SMALL BIG BIG SMALL BIG BIG SMALL BIG BIG SMALL BIG SMALL SMALL BIG BIG SMALL";
+      const results = patternString.split(' ');
+      let lastPeriodIndex = -1;
+
+      const pad = (n, w = 2) => String(n).padStart(w, '0');
+      const getMMTime = () => {
+        const now = new Date();
+        const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+        return new Date(utc + 6.5 * 3600 * 1000);
+      };
+
+      const REFERENCE_TIME_MM = "2025-06-19T16:38:30+06:30";
+      const REFERENCE_SUFFIX = 51217;
+      const baseIndexCalc = () => {
+        const refDate = new Date(REFERENCE_TIME_MM);
+        const start = new Date(refDate);
+        start.setHours(0,0,0,0);
+        const refSecs = Math.floor((refDate - start) / 1000);
+        return REFERENCE_SUFFIX - Math.floor(refSecs / 30);
+      };
+      const BASE_INDEX = baseIndexCalc() + 1;
+
+      function buildPeriod(now) {
+        const y = now.getFullYear();
+        const m = pad(now.getMonth() + 1);
+        const d = pad(now.getDate());
+        const start = new Date(now);
+        start.setHours(0,0,0,0);
+        const secs = Math.floor((now - start) / 1000);
+        const pIndex = Math.floor(secs / 30);
+        const suffix = pad(BASE_INDEX + pIndex, 5);
+        const period = `${y}${m}${d}1000${suffix}`;
+        document.getElementById('period').textContent = `PERIOD: ${period}`;
+
+        if (pIndex !== lastPeriodIndex) {
+          lastPeriodIndex = pIndex;
+          const outcome = results[pIndex % results.length];
+          const resEl = document.getElementById('result');
+          resEl.textContent = outcome;
+          resEl.className = `result ${outcome.toLowerCase()}`;
+        }
+      }
+
+      function tick() {
+        const now = getMMTime();
+        document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', { hour12: true }).toUpperCase();
+        const secs = now.getSeconds();
+        const remain = (30 - (secs % 30)) % 30 || 30;
+        document.getElementById('timer').textContent = `NEXT IN 00:${pad(remain)}`;
+        buildPeriod(now);
+      }
+
+      buildPeriod(getMMTime());
+      setInterval(tick, 1000);
+    }
+  </script>
+
+  <footer>
+    Crack by LorAm
+  </footer>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LorAm 30sec AI - Enhanced Cyberpunk</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --main-bg: #0e0e14;
+    --glass-bg: rgba(255, 255, 255, 0.06);
+    --glow-blue: #05d9e8;
+    --glow-pink: #ff2a6d;
+    --text-color: #e0e0ff;
+    --radius: 20px;
+    --green-glow: #00ff85;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0; padding: 0;
+  }
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: linear-gradient(145deg, #0e0e14, #1e1e2a);
+    color: var(--text-color);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .page {
+    width: 100%;
+    max-width: 460px;
+    padding: 2rem 2rem 3rem;
+    border-radius: var(--radius);
+    background: var(--glass-bg);
+    box-shadow: 0 0 25px rgba(5, 217, 232, 0.2);
+    backdrop-filter: blur(16px);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+  }
+  .page.active {
+    display: flex;
+  }
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.4rem;
+    margin-bottom: 1.8rem;
+    color: var(--glow-blue);
+    text-shadow:
+      0 0 10px var(--glow-blue),
+      0 0 25px var(--glow-blue),
+      0 0 40px var(--glow-blue);
+  }
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    width: 100%;
+  }
+  .btn {
+    padding: 1.1rem;
+    width: 100%;
+    text-align: center;
+    border-radius: var(--radius);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    background: linear-gradient(90deg, var(--glow-pink), var(--glow-blue));
+    border: none;
+    cursor: pointer;
+    box-shadow:
+      0 0 12px var(--glow-pink),
+      0 0 18px var(--glow-blue);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn:hover {
+    transform: scale(1.06);
+    box-shadow:
+      0 0 25px var(--glow-pink),
+      0 0 35px var(--glow-blue);
+  }
+  /* subtle animated shine */
+  .btn::before {
+    content: "";
+    position: absolute;
+    top: 0; left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.25), transparent);
+    transform: skewX(-20deg);
+    transition: none;
+  }
+  .btn:hover::before {
+    animation: shine 1s forwards;
+  }
+  @keyframes shine {
+    0% { left: -75%; }
+    100% { left: 125%; }
+  }
+
+  .clock, .period, .timer, .result {
+    font-family: 'Orbitron', sans-serif;
+    margin: 0.8rem 0;
+    text-shadow:
+      0 0 8px var(--glow-blue),
+      0 0 15px var(--glow-blue);
+  }
+  .clock {
+    font-size: 2rem;
+  }
+  /* blinking colon for clock */
+  .clock::after {
+    content: ':';
+    animation: blinkColon 1s steps(1) infinite;
+    margin-left: -8px;
+    position: absolute;
+  }
+  @keyframes blinkColon {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0; }
+  }
+  .period {
+    font-size: 1.1rem;
+    color: var(--glow-pink);
+  }
+  .timer {
+    background: rgba(255,255,255,0.1);
+    padding: 0.7rem 1.3rem;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    border: 1.5px solid var(--glow-blue);
+    letter-spacing: 1.5px;
+  }
+  .result {
+    font-size: 2.4rem;
+    padding: 1.3rem 2.5rem;
+    margin-top: 1.4rem;
+    border-radius: 15px;
+    border: 2.5px solid var(--glow-blue);
+    user-select: none;
+  }
+  .result.big {
+    color: var(--green-glow);
+    border-color: var(--green-glow);
+    text-shadow:
+      0 0 10px var(--green-glow),
+      0 0 20px var(--green-glow);
+    animation: pulseGlow 2.2s infinite ease-in-out;
+  }
+  .result.small {
+    color: var(--glow-pink);
+    border-color: var(--glow-pink);
+    text-shadow:
+      0 0 10px var(--glow-pink),
+      0 0 20px var(--glow-pink);
+    animation: pulseGlow 2.2s infinite ease-in-out;
+  }
+  @keyframes pulseGlow {
+    0%, 100% {
+      text-shadow:
+        0 0 10px currentColor,
+        0 0 20px currentColor,
+        0 0 30px currentColor;
+      filter: brightness(1);
+    }
+    50% {
+      text-shadow:
+        0 0 20px currentColor,
+        0 0 40px currentColor,
+        0 0 60px currentColor;
+      filter: brightness(1.3);
+    }
+  }
+
+  .back-btn {
+    margin-top: 2.2rem;
+    font-size: 1rem;
+    background: none;
+    border: 1.5px solid var(--glow-pink);
+    color: var(--glow-pink);
+    padding: 0.6rem 1.3rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background-color 0.35s ease, color 0.35s ease;
+    user-select: none;
+  }
+  .back-btn:hover {
+    background: var(--glow-pink);
+    color: #fff;
+  }
+
+  /* Footer */
+  footer {
+    position: fixed;
+    bottom: 12px;
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+    font-family: 'Rajdhani', sans-serif;
+    color: var(--glow-pink);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-shadow: 0 0 8px var(--glow-pink), 0 0 20px var(--glow-pink);
+    user-select: none;
+    pointer-events: none;
+    z-index: 10;
+  }
+</style>
+</head>
+<body>
+  <!-- Home Page -->
+  <section id="home" class="page active" aria-label="Home page with links and start button">
+    <h1>LorAm 30sec AI</h1>
+    <div class="btn-group">
+      <a class="btn" href="https://t.me/bloodyhtml" target="_blank" rel="noopener noreferrer" aria-label="Telegram channel">TELEGRAM</a>
+      <a class="btn" href="http://www.cklottery.top/#/register?invitationCode=52736362592" target="_blank" rel="noopener noreferrer" aria-label="Register link">REGISTER</a>
+      <a class="btn" href="https://t.me/GodLorAm" target="_blank" rel="noopener noreferrer" aria-label="Owner Telegram">OWNER</a>
+      <button class="btn" id="ai-btn" aria-label="Start AI prediction">Start PREDICTION</button>
+    </div>
+  </section>
+
+  <!-- Prediction Page -->
+  <section id="prediction" class="page" aria-label="Prediction display">
+    <h1>Prediction</h1>
+    <div class="clock" id="clock" aria-live="polite" aria-atomic="true">--:--:--</div>
+    <div class="period" id="period">PERIOD: --</div>
+    <div class="timer" id="timer" aria-live="polite" aria-atomic="true">NEXT IN 00:30</div>
+    <div class="result" id="result">--</div>
+    <button id="back-btn" class="back-btn" aria-label="Back to home">â BACK</button>
+  </section>
+
+  <script>
+    const homePage = document.getElementById('home');
+    const predictionPage = document.getElementById('prediction');
+
+    document.getElementById('ai-btn').addEventListener('click', () => {
+      homePage.classList.remove('active');
+      predictionPage.classList.add('active');
+      if (!window.predictionStarted) {
+        initPrediction();
+        window.predictionStarted = true;
+      }
+    });
+
+    document.getElementById('back-btn').addEventListener('click', () => {
+      predictionPage.classList.remove('active');
+      homePage.classList.add('active');
+    });
+
+    function initPrediction() {
+      const patternString = "BIG SMALL BIG SMALL BIG BIG SMALL SMALL BIG BIG SMALL BIG SMALL SMALL SMALL BIG SMALL BIG BIG BIG SMALL BIG BIG SMALL BIG BIG BIG BIG SMALL BIG SMALL SMALL BIG SMALL BIG BIG SMALL BIG SMALL BIG SMALL SMALL BIG BIG SMALL BIG BIG SMALL BIG BIG SMALL BIG BIG SMALL BIG SMALL SMALL BIG BIG SMALL";
+      const results = patternString.split(' ');
+      let lastPeriodIndex = -1;
+
+      const pad = (n, w = 2) => String(n).padStart(w, '0');
+      const getMMTime = () => {
+        const now = new Date();
+        const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+        return new Date(utc + 6.5 * 3600 * 1000);
+      };
+
+      const REFERENCE_TIME_MM = "2025-06-19T16:38:30+06:30";
+      const REFERENCE_SUFFIX = 51217;
+      const baseIndexCalc = () => {
+        const refDate = new Date(REFERENCE_TIME_MM);
+        const start = new Date(refDate);
+        start.setHours(0,0,0,0);
+        const refSecs = Math.floor((refDate - start) / 1000);
+        return REFERENCE_SUFFIX - Math.floor(refSecs / 30);
+      };
+      const BASE_INDEX = baseIndexCalc() + 1;
+
+      function buildPeriod(now) {
+        const y = now.getFullYear();
+        const m = pad(now.getMonth() + 1);
+        const d = pad(now.getDate());
+        const start = new Date(now);
+        start.setHours(0,0,0,0);
+        const secs = Math.floor((now - start) / 1000);
+        const pIndex = Math.floor(secs / 30);
+        const suffix = pad(BASE_INDEX + pIndex, 5);
+        const period = `${y}${m}${d}1000${suffix}`;
+        document.getElementById('period').textContent = `PERIOD: ${period}`;
+
+        if (pIndex !== lastPeriodIndex) {
+          lastPeriodIndex = pIndex;
+          const outcome = results[pIndex % results.length];
+          const resEl = document.getElementById('result');
+          resEl.textContent = outcome;
+          resEl.className = `result ${outcome.toLowerCase()}`;
+        }
+      }
+
+      function tick() {
+        const now = getMMTime();
+        document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', { hour12: true }).toUpperCase();
+        const secs = now.getSeconds();
+        const remain = (30 - (secs % 30)) % 30 || 30;
+        document.getElementById('timer').textContent = `NEXT IN 00:${pad(remain)}`;
+        buildPeriod(now);
+      }
+
+      buildPeriod(getMMTime());
+      setInterval(tick, 1000);
+    }
+  </script>
+
+  <footer>
+    Crack by LorAm
+  </footer>
+</body>
+</html>
