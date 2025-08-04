@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cyberpunk Prediction</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      color: #00ffee;
+      background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #000);
+      background-size: 400% 400%;
+      animation: gradientMove 15s ease infinite;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+    }
+
+    #loginPage, #mainPage {
+      display: none;
+      width: 100%;
+    }
+
+    #loginPage.active, #mainPage.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    input[type="password"] {
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      background-color: #111;
+      color: #00ffee;
+      outline: none;
+      box-shadow: 0 0 15px #00ffee88;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      background-color: #00ffee;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 0 20px #00ffeeaa;
+      transition: 0.3s;
+      margin: 5px 0;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn:hover {
+      background-color: #00ccaa;
+    }
+
+    #period, #timer, #result {
+      font-size: 1.5rem;
+      margin: 10px 0;
+      padding: 10px 20px;
+      background: rgba(0, 255, 255, 0.1);
+      border-radius: 10px;
+      box-shadow: 0 0 15px #00ffcc66;
+      backdrop-filter: blur(5px);
+    }
+
+    .result-box {
+      margin-top: 20px;
+      padding: 20px;
+      font-size: 2rem;
+      font-weight: bold;
+      border: 2px solid #00ffee;
+      border-radius: 12px;
+      box-shadow: 0 0 25px #00ffeeaa, 0 0 40px #0055ff44;
+      background-color: rgba(0, 0, 0, 0.3);
+      text-transform: uppercase;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    #footer {
+      position: fixed;
+      bottom: 12px;
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      color: #0ff;
+      opacity: 0.5;
+      user-select: none;
+      pointer-events: none;
+      font-family: 'Orbitron', monospace;
+      letter-spacing: 1.5px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Particle Background -->
+  <canvas id="bg"></canvas>
+
+  <!-- Login Page -->
+  <div id="loginPage" class="active">
+    <h1>Welcome</h1>
+    <p>Please enter the password to continue</p>
+    <input type="password" id="password" placeholder="Enter Password" />
+    <button class="btn" onclick="checkPassword()">Access Key</button>
+    <a href="https://t.me/loramprediction" target="_blank" class="btn">Telegram Channel</a>
+    <a href="https://t.me/GodLorAm" target="_blank" class="btn">Get KEY</a>
+    <div id="loginError" style="color:red; margin-top:10px;"></div>
+  </div>
+
+  <!-- Main Page -->
+  <div id="mainPage">
+    <h1>LR Hack V1.5</h1>
+    <div id="period">Period: Loading...</div>
+    <div id="timer">00:00</div>
+    <div id="result" class="result-box">Result: --</div>
+  </div>
+
+  <div id="footer">Produced by LorAm</div>
+
+  <script>
+    function checkPassword() {
+      const input = document.getElementById("password").value;
+      const errorDiv = document.getElementById("loginError");
+      if (input === "loram999") {
+        document.getElementById("loginPage").classList.remove("active");
+        document.getElementById("mainPage").classList.add("active");
+      } else {
+        errorDiv.textContent = "Incorrect password!";
+      }
+    }
+
+    const resultMap = {
+      0: 'Small',
+      1: 'Big',
+      2: 'Small',
+      3: 'Small',
+      4: 'Small',
+      5: 'Big',
+      6: 'Big',
+      7: 'Big',
+      8: 'Big',
+      9: 'Small'
+    };
+
+    function update() {
+      if (!document.getElementById("mainPage").classList.contains("active")) return;
+      const now = new Date();
+      const y = now.getUTCFullYear();
+      const m = String(now.getUTCMonth() + 1).padStart(2, '0');
+      const d = String(now.getUTCDate()).padStart(2, '0');
+      const h = now.getUTCHours();
+      const min = now.getUTCMinutes();
+      const sec = now.getUTCSeconds();
+      const totalMin = h * 60 + min;
+      const period = `${y}${m}${d}1000${10001 + totalMin}`;
+      const lastDigit = parseInt(period.slice(-1));
+      const result = resultMap[lastDigit];
+      document.getElementById("period").textContent = `Period: ${period}`;
+      document.getElementById("timer").textContent = `00:${String(60 - sec).padStart(2, '0')}`;
+      document.getElementById("result").textContent = `Result: ${result}`;
+    }
+
+    setInterval(update, 1000);
+    update();
+  </script>
+
+  <script>
+    // Particle background
+    const canvas = document.getElementById('bg');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.size = Math.random() * 2 + 1;
+        this.alpha = Math.random();
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,255,255,${this.alpha})`;
+        ctx.fill();
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+        }
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      for (let i = 0; i < 150; i++) {
+        particles.push(new Particle());
+      }
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const p of particles) {
+        p.update();
+        p.draw();
+      }
+      requestAnimationFrame(animateParticles);
+    }
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initParticles();
+    });
+
+    initParticles();
+    animateParticles();
+  </script>
+</body>
+</html>
